@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /setups/{setupId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['values', 'demographics', 'timestamp'])
+                    && request.resource.data.values is map
+                    && request.resource.data.values.size() <= 200
+                    && request.resource.data.demographics is map
+                    && request.resource.data.demographics.size() <= 20
+                    && request.resource.data.timestamp is timestamp;
+      allow update, delete: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
